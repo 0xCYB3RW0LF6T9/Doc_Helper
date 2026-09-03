@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Med Helper - Modern doctor directory and healthcare assistance platform">
+
+
+    <title>Med_Helper - Doctor Directory</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <!-- FLOATING MEDICAL ICONS -->
+
+    <div class="floating-icons" aria-hidden="true">
+
+        <span class="float-icon icon-1">✚</span>
+        <span class="float-icon icon-2">⚕</span>
+        <span class="float-icon icon-3">💊</span>
+        <span class="float-icon icon-4">🩺</span>
+        <span class="float-icon icon-5">🧬</span>
+        <span class="float-icon icon-6">❤️</span>
+        <span class="float-icon icon-7">🔬</span>
+        <span class="float-icon icon-8">⚕</span>
+
+    </div>
+
+    <!-- BACKGROUND -->
+
+    <div class="bg-grid"></div>
+
+    <div class="glow glow-1"></div>
+
+    <div class="glow glow-2"></div>
+
+
+    <!-- NAVBAR -->
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <span class="logo-icon">
+                ✚
+            </span>
+
+            <span>
+                Med<span>Helper</span>
+            </span>
+
+        </div>
+
+        <div class="nav-right">
+
+            <button id="loginBtn" class="login-btn" type="button">
+                Login
+            </button>
+
+            <div id="userArea" class="user-area hidden">
+
+                <span id="usernameDisplay">
+                    Admin
+                </span>
+
+                <button id="logoutBtn" class="logout-btn" type="button">
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+
+                <span class="pulse-dot"></span>
+
+                Doctor Directory
+
+            </div>
+
+            <h1>
+                Find the right
+                <span>doctor</span>
+                for you.
+            </h1>
+
+            <p>
+                Search doctors by name, specialty,
+                location, phone or email.
+            </p>
+
+            <div class="search-box">
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input type="text" id="searchInput" placeholder="Search doctors..." autocomplete="off">
+
+                <button id="searchBtn" type="button">
+                    Search
+                </button>
+
+            </div>
+
+            <button id="addDoctorBtn" class="add-doctor-btn" type="button">
+                ＋ Add Doctor
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- DIRECTORY -->
+
+    <main class="main-content">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-label">
+                    DIRECTORY
+                </div>
+
+                <h2>
+                    Available Doctors
+                </h2>
+
+            </div>
+
+            <div id="doctorCount" class="doctor-count">
+                0 doctors
+            </div>
+
+        </div>
+
+        <div id="doctorGrid" class="doctor-grid"></div>
+
+        <div id="emptyState" class="empty-state hidden">
+
+            <div class="empty-icon">
+                ⌕
+            </div>
+
+            <h3>
+                No doctors found
+            </h3>
+
+            <p>
+                Try a different search term.
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- LOGIN MODAL -->
+
+    <div id="loginModal" class="modal">
+
+        <div class="modal-content">
+
+            <button class="modal-close close-modal" data-close="loginModal" type="button">
+                ×
+            </button>
+
+            <div class="modal-icon">
+                🔐
+            </div>
+
+            <h2>
+                Welcome Back
+            </h2>
+
+            <p class="modal-description">
+                Login to manage the doctor directory.
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input type="text" id="username" placeholder="Enter username" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input type="password" id="password" placeholder="Enter password" required>
+
+                </div>
+
+                <button class="submit-btn" type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <div class="demo-login">
+                Demo:
+                <strong>admin</strong>
+                /
+                <strong>1234</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADD / EDIT DOCTOR MODAL -->
+
+    <div id="doctorModal" class="modal">
+
+        <div class="modal-content doctor-modal">
+
+            <button class="modal-close close-modal" data-close="doctorModal" type="button">
+                ×
+            </button>
+
+            <div class="modal-icon">
+                👨‍⚕️
+            </div>
+
+            <h2 id="doctorModalTitle">
+                Add Doctor
+            </h2>
+
+            <p class="modal-description">
+                Add or update doctor information.
+            </p>
+
+            <form id="doctorForm">
+
+                <!-- IMAGE -->
+
+                <div class="image-upload">
+
+                    <div id="imagePreview" class="image-preview">
+                        <span>👤</span>
+                    </div>
+
+                    <div class="image-upload-info">
+
+                        <label for="doctorImage" class="upload-btn">
+                            📷 Choose Photo
+                        </label>
+
+                        <input type="file" id="doctorImage" accept="image/*" hidden>
+
+                        <small>
+                            JPG, PNG or WEBP.
+                            Maximum 2MB.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NAME / SPECIALTY -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="doctorName">
+                            Full Name
+                        </label>
+
+                        <input type="text" id="doctorName" placeholder="Dr. John Doe" required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="doctorSpecialty">
+                            Specialty
+                        </label>
+
+                        <input type="text" id="doctorSpecialty" placeholder="Cardiologist" required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PHONE / EMAIL -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="doctorPhone">
+                            Phone
+                        </label>
+
+                        <input type="tel" id="doctorPhone" placeholder="+880 1712-345678" required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="doctorEmail">
+                            Email
+                        </label>
+
+                        <input type="email" id="doctorEmail" placeholder="doctor@example.com" required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FULL ADDRESS -->
+
+                <div class="form-group">
+
+                    <label for="doctorAddress">
+                        Full Address
+                    </label>
+
+                    <input type="text" id="doctorAddress" placeholder="House 12, Road 5, Dhanmondi, Dhaka, Bangladesh"
+                        required>
+
+                    <small class="field-help">
+                        Enter the complete address.
+                        The map will use this address.
+                    </small>
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="doctorLocation">
+                        Area / City
+                    </label>
+
+                    <input type="text" id="doctorLocation" placeholder="Dhanmondi, Dhaka" required>
+
+                </div>
+
+
+                <!-- SCHEDULE -->
+
+                <div class="schedule-section">
+
+                    <div class="schedule-heading">
+
+                        <div>
+
+                            <div class="schedule-label">
+                                AVAILABILITY
+                            </div>
+
+                            <h3>
+                                Weekly Schedule
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    <p class="schedule-description">
+                        Set the days and hours when this doctor
+                        is available.
+                    </p>
+
+                    <div class="schedule-table-wrap">
+
+                        <table class="schedule-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Day
+                                    </th>
+
+                                    <th>
+                                        Available
+                                    </th>
+
+                                    <th>
+                                        Start
+                                    </th>
+
+                                    <th>
+                                        End
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr data-day="monday">
+
+                                    <td>Monday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle" checked>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="17:00">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="21:00">
+                                    </td>
+
+                                </tr>
+
+                                <tr data-day="tuesday">
+
+                                    <td>Tuesday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle" checked>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="17:00">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="21:00">
+                                    </td>
+
+                                </tr>
+
+                                <tr data-day="wednesday">
+
+                                    <td>Wednesday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle" checked>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="17:00">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="21:00">
+                                    </td>
+
+                                </tr>
+
+                                <tr data-day="thursday">
+
+                                    <td>Thursday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle" checked>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="17:00">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="21:00">
+                                    </td>
+
+                                </tr>
+
+                                <tr data-day="friday">
+
+                                    <td>Friday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="17:00" disabled>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="21:00" disabled>
+                                    </td>
+
+                                </tr>
+
+                                <tr data-day="saturday">
+
+                                    <td>Saturday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle" checked>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="10:00">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="14:00">
+                                    </td>
+
+                                </tr>
+
+                                <tr data-day="sunday">
+
+                                    <td>Sunday</td>
+
+                                    <td>
+                                        <input type="checkbox" class="day-toggle">
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-start" value="10:00" disabled>
+                                    </td>
+
+                                    <td>
+                                        <input type="time" class="schedule-end" value="14:00" disabled>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HIDDEN COORDINATES -->
+
+                <input type="hidden" id="doctorLat">
+
+                <input type="hidden" id="doctorLng">
+
+                <div id="geocodeStatus" class="geocode-status"></div>
+
+                <button class="submit-btn" type="submit">
+                    Add Doctor
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- DETAILS MODAL -->
+
+    <div id="detailsModal" class="modal">
+
+        <div class="modal-content details-modal">
+
+            <button class="modal-close close-modal" data-close="detailsModal" type="button">
+                ×
+            </button>
+
+            <div id="detailsContent"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DELETE MODAL -->
+
+    <div id="deleteModal" class="modal">
+
+        <div class="modal-content delete-modal">
+
+            <button class="modal-close close-modal" data-close="deleteModal" type="button">
+                ×
+            </button>
+
+            <div class="delete-icon">
+                ⚠
+            </div>
+
+            <h2>
+                Delete Doctor?
+            </h2>
+
+            <p class="modal-description">
+
+                Are you sure you want to permanently
+                delete
+
+                <strong id="deleteDoctorName">
+                    this doctor
+                </strong>?
+
+                <br>
+
+                This action cannot be undone.
+
+            </p>
+
+            <div class="delete-actions">
+
+                <button id="cancelDeleteBtn" class="cancel-btn" type="button">
+                    Cancel
+                </button>
+
+                <button id="confirmDeleteBtn" class="confirm-delete-btn" type="button">
+                    🗑 Delete Doctor
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOAST -->
+
+    <div id="toast" class="toast">
+        Message
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-line"></div>
+
+        <p>
+            © 2026 Med_Helper Doctor Directory
+        </p>
+
+    </footer>
+
+
+    <!-- IMPORTANT:
+         Leaflet JS MUST load before script.js
+    -->
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
